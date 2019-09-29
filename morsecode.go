@@ -10,8 +10,8 @@ import (
 	"fmt"
 )
 
-// raw string containing morse code
-const morseCodeRaw = ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --.."
+// split raw string containing morse code by spaces
+var morse []string = strings.Split(".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --..", " ")
 
 // define space flag
 var space = flag.Bool("space", false, "adds spaces between each morse character code")
@@ -19,22 +19,33 @@ var space = flag.Bool("space", false, "adds spaces between each morse character 
 func main() {
 	// check os.Args for flags, and set variables
 	flag.Parse()
-	// create splice out of morse characters (to cylcle through later)
-	morse := strings.Split(morseCodeRaw, " ")
-	returnString := ""
-	// grab the last word in os.Args for conversion
-	userArg := strings.ToLower(os.Args[len(os.Args)-1])
+	// grab words is os.Args for conversion
+	userArg := getWords()
 	// loop over each character, grab the byte value, use that to find morse character
-	for i := range userArg {
-		currentChar := fmt.Sprint(userArg[i])
-		n, err := strconv.Atoi(currentChar)
+	fmt.Println(convChars(userArg))
+}
+
+func getWords() string {
+	words := ""
+	if *space {
+		words = strings.ToLower(strings.Join(os.Args[2:len(os.Args)], ""))
+	} else {
+		words = strings.ToLower(strings.Join(os.Args[1:len(os.Args)], ""))
+	}
+	return words
+}
+
+func convChars(letters string) string {
+	convertedChars := ""
+	for i := range letters {
+		n, err := strconv.Atoi(fmt.Sprint(letters[i]))
 		if err != nil {
 			log.Fatal(err)
 		}
-		returnString += morse[n-97]
+		convertedChars += morse[n-97]
 		if *space {
-			returnString += " "
+			convertedChars += " "
 		}
 	}
-	fmt.Println(returnString)
+	return convertedChars
 }
